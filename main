@@ -1,0 +1,53 @@
+int DAP = D0;
+int DAR = D1;
+int photoresistor = A0;
+int power = A5;
+int analogvalue;
+int occupancy;
+
+
+void setup() {
+
+    pinMode(DAP,OUTPUT);
+    pinMode(DAR,INPUT);
+
+    pinMode(photoresistor,INPUT);  
+    pinMode(power,OUTPUT); 
+
+    digitalWrite(power,HIGH);
+
+    Particle.variable("analogvalue", &analogvalue, INT);
+    Particle.variable("occupancy", &occupancy, INT);
+
+}
+
+void loop() {
+    while (Particle.connected()){
+        analogvalue = analogRead(photoresistor);
+       
+        if(analogvalue >=30){
+
+            if(digitalRead(DAR)==HIGH){
+        
+                occupancy = 0;
+                Particle.publish("occupancy", "0", PRIVATE);
+    
+                delay(5000);
+            }
+            else if (digitalRead(DAR)==LOW){
+
+            occupancy=1;
+            Particle.publish("occupancy", "1", PRIVATE);
+
+            delay(5000);
+            }
+        }
+        
+        else if (analogvalue<30){
+            Particle.publish("occupancy", "Null", PRIVATE);
+            delay (2000);
+        }
+        
+    }
+
+}
